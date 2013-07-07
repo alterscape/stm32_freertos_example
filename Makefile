@@ -93,6 +93,7 @@ SOURCE=	main.c 	drivers/lcd.c \
 		drivers/serial.c \
 		drivers/adc.c \
 		drivers/leds.c \
+		drivers/rtc.c \
 		menu.c \
 		drivers/speaker.c \
 		drivers/timer.c \
@@ -112,6 +113,9 @@ ST_LIB_SOURCE= \
 		$(ST_LIB_DIR)/src/stm32f10x_fsmc.c \
 		$(ST_LIB_DIR)/src/stm32f10x_flash.c \
 		$(ST_LIB_DIR)/src/stm32f10x_adc.c \
+		$(ST_LIB_DIR)/src/stm32f10x_rtc.c \
+		$(ST_LIB_DIR)/src/stm32f10x_bkp.c \
+		$(ST_LIB_DIR)/src/stm32f10x_pwr.c
 
 # FreeRTOS source files.
 FREERTOS_SOURCE= $(RTOS_SOURCE_DIR)/list.c \

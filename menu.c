@@ -15,8 +15,9 @@
 #include "menu.h"
 #include "queue.h"
 #include "lcd.h"
-#define HEIGHT 6
+#include "rtc.h"
 
+#define HEIGHT 6
 #define KEY_UP    0x8
 #define KEY_DOWN  0x4
 #define KEY_LEFT  0x2
@@ -177,6 +178,9 @@ static void menu_update(void)
     }
 
     lcd_printf(30, 0, 10, "%dms", (xTaskGetTickCount() - start_time));
+    char* timeString = Time_GetFormattedString();
+    lcd_printf(10, 0, 10, "%s", timeString);
+    vPortFree(timeString);
     lcd_release();
 }
 

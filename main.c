@@ -19,6 +19,7 @@
 
 /*app includes. */
 //#include "stm3210e_lcd.h"
+#include "rtc.h"
 #include "leds.h"
 #include "touch.h"
 #include "lcd.h"
@@ -27,6 +28,7 @@
 #include "timer.h"
 #include "ds1820.h"
 #include "serial.h"
+
 /*-----------------------------------------------------------*/
 
 /* The period of the system clock in nano seconds.  This is used to calculate
@@ -111,6 +113,7 @@ int main( void )
 {
     prvSetupHardware();// set up peripherals etc 
     USARTInit(USART_PARAMS1);
+    RTC_Configuration();
 
     printf("Hello!\r\n");
 
