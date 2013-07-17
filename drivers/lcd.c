@@ -619,7 +619,7 @@ static void lcd_char_xy(unsigned short Xpos,unsigned short Ypos,unsigned char c,
     }
 }
 
-static void lcd_font_char_xy(int xPos, int yPos, char character, FONT_INFO* fontInfo, uint16_t fgColor, uint16_t bgColor) 
+static int lcd_font_char_xy(int xPos, int yPos, char character, FONT_INFO* fontInfo, uint16_t fgColor, uint16_t bgColor) 
 {
     uint8_t i = 0;
     uint8_t j = 0;
@@ -666,6 +666,7 @@ static void lcd_font_char_xy(int xPos, int yPos, char character, FONT_INFO* font
         //write_data(col);
         }
     }
+	return width;
 }
 
 static void lcd_char_test(FONT_INFO* fontInfo)
@@ -771,14 +772,14 @@ void lcd_font_text_xy(uint16_t Xpos, uint16_t Ypos, const char *str, FONT_INFO *
 {
     LCD_LOCK;
     uint8_t TempChar;
-    
+    uint8_t width;
 
     while ((TempChar=*str++))
     {
-        lcd_font_char_xy(Xpos, Ypos, TempChar, font, Color, bkColor);    
-        if (Xpos < MAX_X - 8)
+        width = lcd_font_char_xy(Xpos, Ypos, TempChar, font, Color, bkColor);    
+        if (Xpos < MAX_X - width)
         {
-            Xpos+=35;
+            Xpos += width;
         } 
         else if (Ypos < MAX_Y - 16)
         {
