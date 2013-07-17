@@ -157,9 +157,7 @@ void lcd_init(void)
     //SET UP//
     power_SET(); //Set up the power Registers
     gamma_SET(); //Set up the Gamma Registers
-
-#if 1
-    //TEST//
+#if 1    //TEST//
     display_OFF(); //Switch off the display for tests
     lcd_data_bus_test();
     lcd_gram_test(); 
@@ -308,27 +306,27 @@ static void power_SET(void)
     write_reg(0x0000,0x0001); //Start Oscillation
     Delay(10);
 
-    write_reg(0x0015,0x0030);// internal voltage reg at 0.65*Vci
-    write_reg(0x0011,0x0040);//Power Control Setup Reg 1 
+    write_reg(0x0015,0x0030); // internal voltage reg at 0.65*Vci
+    write_reg(0x0011,0x0040); //Power Control Setup Reg 1 
     //Step-Up Circuit 1,2 = Fosc/128,
     // VciOut - 1 * Vci
-    write_reg(0x0010,0x1628);//Power Control Setup Reg 1
-    write_reg(0x0012,0x0000);//Power Control Setup Reg 3
-    write_reg(0x0013,0x104d);//Power Control Setup Reg 4
+    write_reg(0x0010,0x1628); //Power Control Setup Reg 1
+    write_reg(0x0012,0x0000); //Power Control Setup Reg 3
+    write_reg(0x0013,0x104d); //Power Control Setup Reg 4
     Delay(10);
-    write_reg(0x0012,0x0010);//VREGout = 1.47
+    write_reg(0x0012,0x0010); //VREGout = 1.47
     Delay(10);
-    write_reg(0x0010,0x2620);//Power Control Setup Reg1
+    write_reg(0x0010,0x2620); //Power Control Setup Reg1
     write_reg(0x0013,0x344d); //304d
     Delay(10);
     
-    write_reg(0x0001,0x0100);//Driver Output Control
-    write_reg(0x0002,0x0300);//Driving Range Control
-    write_reg(0x0003,0x1008);//Entry Mode BGR, Horizontal, then vertical
-    write_reg(0x0008,0x0604);//Display Control, first 4 and last 6
+    write_reg(0x0001,0x0100); //Driver Output Control
+    write_reg(0x0002,0x0300); //Driving Range Control
+    write_reg(0x0003,0x1008); //Entry Mode BGR, Horizontal, then vertical
+    write_reg(0x0008,0x0604); //Display Control, first 4 and last 6
     //lines blank
-    write_reg(0x0009,0x0000);//Display Control
-    write_reg(0x000A,0x0008);//Output FMARK every 1 Frame
+    write_reg(0x0009,0x0000); //Display Control
+    write_reg(0x000A,0x0008); //Output FMARK every 1 Frame
 
     write_reg(0x000C,0x1003);
 
@@ -383,7 +381,7 @@ static void lcd_data_bus_test(void)
     printf("bus test\r\n");
 
     /* [5:4]-ID~ID0 [3]-AM-1��ֱ-0ˮƽ */
-    write_reg(0x0003,(1<<12)|(1<<5)|(1<<4) | (0<<3) );
+    write_reg(0x0003, (1 << 12) | (1 << 5) | (1 << 4) | (0 << 3) );
 
     /* Write Alternating Bit Values */
     lcd_SetCursor(0,0);
@@ -457,25 +455,25 @@ void LCD_SetDisplayWindow(uint8_t Xpos, uint16_t Ypos, uint8_t Height, uint16_t 
     /* Horizontal GRAM Start Address */
     if(Xpos >= Height)
     {
-	write_reg(0x0080, (Xpos - Height + 1));
-	write_reg(0x0080, (Xpos));
+		write_reg(0x0080, (Xpos - Height + 1));
+		write_reg(0x0080, (Xpos));
     }
     else
     {
-	printf("outside region\r\n");
-	write_reg(0x0080, 0);
+		printf("outside region\r\n");
+		write_reg(0x0080, 0);
     }
     /* Horizontal GRAM End Address */
     write_reg(0x0082, Ypos);
     /* Vertical GRAM Start Address */
     if(Ypos >= Width)
     {
-	write_reg(0x0081, (Ypos));
+		write_reg(0x0081, (Ypos));
     }
     else
     {
-	printf("outside region\r\n");
-	write_reg(0x0081, 0);
+		printf("outside region\r\n");
+		write_reg(0x0081, 0);
     }
     /* Vertical GRAM End Address */
     write_reg(0x0082, Ypos+Height);
@@ -621,6 +619,64 @@ static void lcd_char_xy(unsigned short Xpos,unsigned short Ypos,unsigned char c,
     }
 }
 
+static void lcd_font_char_xy(int xPos, int yPos, char character, FONT_INFO* fontInfo, uint16_t fgColor, uint16_t bgColor) 
+{
+    uint8_t i = 0;
+    uint8_t j = 0;
+    uint8_t height = fontInfo->heightPages * 8;
+    uint8_t width;
+    uint8_t tableOffset = character - fontInfo->startChar;//32;
+    FONT_CHAR_INFO fontCharInfo = fontInfo->charInfo[(tableOffset)];
+    uint16_t offset = fontCharInfo.offset;
+	uint16_t lineOffset;
+	uint8_t bitOffset;
+	uint8_t byteOffset;
+    width = fontCharInfo.widthBits;
+    //uint8_t *buffer = &fontInfo->data[offset];//&(fontInfo->data[offset]);
+    //const unsigned char *buffer = //AsciiLib[(c - 32)] ;
+    uint8_t tmp_char = 0;
+
+	// TODO handle space character.
+    if (character == 32)
+    {
+        return;
+    }
+
+    //printf("char: '%c'; ascii: %d; table offset: %d; offset: %d; width: %d; height %d\r\n", character, (int)character, tableOffset, offset, width);
+    for (i = 0; i < height; i++)
+    {
+		lineOffset = i * 5;//(width/8);
+		//printf("lineOffset: %d; ", lineOffset);
+        //tmp_char=buffer[lineOffset];
+        for (j = 0; j < width; j++)
+        {
+			// iterate over each horiz bit
+			byteOffset = j / 8;
+			bitOffset = j % 8;
+			tmp_char = fontInfo->data[offset + lineOffset + byteOffset]; //*(buffer + lineOffset + byteOffset);
+			//printf("\tj: %d; byteOffset: %d; bitOffset: %d; tmp_char:%d\n", j, byteOffset, bitOffset, tmp_char);
+            if ( (tmp_char >> 7 - bitOffset) & 0x01)
+            {
+                lcd_set_cursor(xPos + j, yPos + i);
+                lcd_write_ram_prepare();
+                write_data(fgColor);
+            }
+
+        //uint16_t col = ( (tmp_char >> 7-j) & 0x01) ? charColor : bkColor;
+        //write_data(col);
+        }
+    }
+}
+
+static void lcd_char_test(FONT_INFO* fontInfo)
+{
+	int xPos = 50;
+	int yPos = 50;
+	char character = '0';
+	
+
+}
+
 static void lcd_DrawHLine(int x1, int x2, int col, int y ) 
 {
     uint16_t ptr;
@@ -711,9 +767,41 @@ void lcd_text_xy(uint16_t Xpos, uint16_t Ypos, const char *str,uint16_t Color, u
     LCD_UNLOCK;
 }
 
+void lcd_font_text_xy(uint16_t Xpos, uint16_t Ypos, const char *str, FONT_INFO *font, uint16_t Color, uint16_t bkColor)
+{
+    LCD_LOCK;
+    uint8_t TempChar;
+    
+
+    while ((TempChar=*str++))
+    {
+        lcd_font_char_xy(Xpos, Ypos, TempChar, font, Color, bkColor);    
+        if (Xpos < MAX_X - 8)
+        {
+            Xpos+=35;
+        } 
+        else if (Ypos < MAX_Y - 16)
+        {
+            Xpos=0;
+            Ypos+=16;
+        }   
+        else
+        {
+            Xpos=0;
+            Ypos=0;
+        }    
+    }
+    LCD_UNLOCK;
+}
+
 void lcd_text(uint8_t col, uint8_t row, const char *text)
 {
     lcd_text_xy(col * 8, row * 16, text, 0xFFFF, bg_col);
+}
+
+void lcd_font_text(uint8_t col, uint8_t row, FONT_INFO* font, const char *text)
+{
+    lcd_font_text_xy(col * 8, row * 16, text, font, 0xFFFF, bg_col);
 }
 
 void lcd_fill(uint16_t xx, uint16_t yy, uint16_t ww, uint16_t hh, uint16_t color)
@@ -748,6 +836,28 @@ void lcd_printf(uint8_t col, uint8_t row, uint8_t ww, const char *fmt, ...)
     message[len] = 0;
     
     lcd_text(col, row, message);
+
+    LCD_UNLOCK;
+}
+
+void lcd_font_printf(uint8_t col, uint8_t row, uint8_t ww, FONT_INFO* font, const char *fmt, ...)
+{
+    LCD_LOCK;
+    char message[31];
+    va_list ap;
+    va_start(ap, fmt);
+    int len = vsnprintf(message, sizeof(message) - 1, fmt, ap);
+    va_end(ap);
+
+    printf("trying to print %s\n", message);
+
+    while (len < ww && len < sizeof(message) - 2)
+    {
+        message[len++] = ' ';
+    }
+    message[len] = 0;
+    
+    lcd_font_text(col, row, font, message);
 
     LCD_UNLOCK;
 }

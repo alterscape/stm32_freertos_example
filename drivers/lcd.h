@@ -8,6 +8,9 @@
 */
 
 /* LCD color */
+	 
+#include "bitmapdb.h"
+	 
 #define White            0xFFFF
 #define Black            0x0000
 #define Grey             0xF7DE

@@ -24,6 +24,7 @@
 #include "touch.h"
 #include "lcd.h"
 #include "menu.h" 
+#include "clock_graphics.h"
 #include "speaker.h"
 #include "timer.h"
 #include "ds1820.h"
@@ -49,7 +50,8 @@ xTaskHandle xLCDTaskHandle,
     xAdcTaskHandle , 
     xBeepTaskHandle, 
     xTimerSetupHandle,
-    xDS1820Handle;
+    xDS1820Handle,
+    xClockGraphicsHandle;
 
 
 // Needed by file core_cm3.h
@@ -122,12 +124,19 @@ int main( void )
 
 	menu_set_root(main_menu);
 
-    xTaskCreate( vTouchTask, 
-                 ( signed portCHAR * ) "touch", 
-                 configMINIMAL_STACK_SIZE +1000, 
-                 NULL, 
-                 tskIDLE_PRIORITY+2,
-                 &xTouchTaskHandle );
+    // xTaskCreate( vTouchTask, 
+    //              ( signed portCHAR * ) "touch", 
+    //              configMINIMAL_STACK_SIZE +1000, 
+    //              NULL, 
+    //              tskIDLE_PRIORITY+2,
+    //              &xTouchTaskHandle );
+
+    xTaskCreate( vClockGraphicsTask,
+                ( signed portCHAR * ) "clock",
+                configMINIMAL_STACK_SIZE + 1000,
+                NULL,
+                tskIDLE_PRIORITY + 3,
+                &xClockGraphicsHandle);
 
     /* Create you application tasks if needed here
     xTaskCreate( vKegTask, 

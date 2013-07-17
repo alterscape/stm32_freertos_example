@@ -73,7 +73,7 @@ CFLAGS=-g$(DEBUG)\
 		-I drivers \
 		-I $(ST_LIB_DIR)/inc \
 		-I $(ARM_CMSIS_DIR)\
-	       	-D STM32F10X_HD \
+	    -D STM32F10X_HD \
 		-D USE_STDPERIPH_DRIVER \
 		-D VECT_TAB_FLASH \
 		-D GCC_ARMCM3 \
@@ -87,7 +87,8 @@ CFLAGS=-g$(DEBUG)\
 
 # Source files
 #stm3210e_lcd.c 
-SOURCE=	main.c 	drivers/lcd.c \
+SOURCE=	main.c \
+		drivers/lcd.c \
 		stf_syscalls_minimal.c \
 		drivers/touch.c \
 		drivers/serial.c \
@@ -95,6 +96,8 @@ SOURCE=	main.c 	drivers/lcd.c \
 		drivers/leds.c \
 		drivers/rtc.c \
 		menu.c \
+		helvetica_neue_36_clock.c \
+		clock_graphics.c \
 		drivers/speaker.c \
 		drivers/timer.c \
 		drivers/ds1820.c
@@ -211,7 +214,7 @@ jtag: all
 	sleep 1
 	echo "stm32f1x mass_erase 0" | nc localhost 4444
 	sleep 1
-	echo "flash write_bank 0 Debug/stm32_freertos_example.bin 0" | nc localhost 4444
+	echo "flash write_bank 0 RTOSBrew.bin 0" | nc localhost 4444
 	sleep 2
 	echo "reset halt" | nc localhost 4444
 
