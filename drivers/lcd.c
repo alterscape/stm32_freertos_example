@@ -625,6 +625,7 @@ static int lcd_font_char_xy(int xPos, int yPos, char character, FONT_INFO* fontI
     uint8_t j = 0;
     uint8_t height = fontInfo->heightPages * 8;
     uint8_t width;
+	uint8_t widthBytes;
     uint8_t tableOffset = character - fontInfo->startChar;//32;
     FONT_CHAR_INFO fontCharInfo = fontInfo->charInfo[(tableOffset)];
     uint16_t offset = fontCharInfo.offset;
@@ -639,15 +640,28 @@ static int lcd_font_char_xy(int xPos, int yPos, char character, FONT_INFO* fontI
 	// TODO handle space character.
     if (character == 32)
     {
-        return;
+        return fontInfo->spacePixels;
     }
-
+	if (character < fontInfo->startChar) 
+	{
+		return 0;
+	}
+	if (character > fontInfo->endChar) {
+		return 0;
+	}
+	
+	widthBytes = ((width + (8 - 1)) / 8);
+	
     //printf("char: '%c'; ascii: %d; table offset: %d; offset: %d; width: %d; height %d\r\n", character, (int)character, tableOffset, offset, width);
     for (i = 0; i < height; i++)
     {
-		lineOffset = i * 5;//(width/8);
+		// as per http://stackoverflow.com/a/2422722/208285
+		
+		lineOffset = i * widthBytes;//5;//(width/8);
 		//printf("lineOffset: %d; ", lineOffset);
         //tmp_char=buffer[lineOffset];
+		lcd_set_cursor(xPos, yPos + i);
+		lcd_write_ram_prepare();
         for (j = 0; j < width; j++)
         {
 			// iterate over each horiz bit
@@ -657,10 +671,12 @@ static int lcd_font_char_xy(int xPos, int yPos, char character, FONT_INFO* fontI
 			//printf("\tj: %d; byteOffset: %d; bitOffset: %d; tmp_char:%d\n", j, byteOffset, bitOffset, tmp_char);
             if ( (tmp_char >> 7 - bitOffset) & 0x01)
             {
-                lcd_set_cursor(xPos + j, yPos + i);
-                lcd_write_ram_prepare();
+                //lcd_set_cursor(xPos + j, yPos + i);
+                
                 write_data(fgColor);
-            }
+            } else {
+				write_data(bgColor);
+			}
 
         //uint16_t col = ( (tmp_char >> 7-j) & 0x01) ? charColor : bkColor;
         //write_data(col);

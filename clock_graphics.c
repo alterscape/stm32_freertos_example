@@ -17,7 +17,7 @@ void vClockGraphicsTask( void *pvParameters )
 		lcd_lock();
 		//
 		//lcd_fill(160, 0, 320, 16, 0x000000);
-		lcd_clear(0);
+		//lcd_clear(0);
    		char* timeString = Time_GetFormattedString();
     	//lcd_printf(10, 0, 10, "%s", timeString);
     	lcd_font_printf(2, 2, 10, &helveticaNeue_36ptFontInfo, "%s", timeString);
