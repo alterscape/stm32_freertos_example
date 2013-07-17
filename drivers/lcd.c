@@ -623,7 +623,7 @@ static int lcd_font_char_xy(int xPos, int yPos, char character, FONT_INFO* fontI
 {
     uint8_t i = 0;
     uint8_t j = 0;
-    uint8_t height = fontInfo->heightPages * 8;
+    uint8_t height = fontInfo->height;
     uint8_t width;
 	uint8_t widthBytes;
     uint8_t tableOffset = character - fontInfo->startChar;//32;
@@ -642,6 +642,7 @@ static int lcd_font_char_xy(int xPos, int yPos, char character, FONT_INFO* fontI
     {
         return fontInfo->spacePixels;
     }
+	
 	if (character < fontInfo->startChar) 
 	{
 		return 0;

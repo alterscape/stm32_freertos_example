@@ -847,7 +847,7 @@ const FONT_CHAR_INFO helveticaNeue_36ptDescriptors[] =
 // Font information for Helvetica Neue 36pt
 const FONT_INFO helveticaNeue_36ptFontInfo =
 {
-	6, //  Character height
+	42, //  Character height
 	'0', //  Start character
 	'p', //  End character
 	2, //  Width, in pixels, of space character
